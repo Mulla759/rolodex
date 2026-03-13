@@ -1,0 +1,35 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500&family=DM+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* ── surface ── */
+    --color-page:        #F3F2EC;
+    --color-grid:        #E5E3DB;
+    --color-card:        #E2DBC8;
+    --color-card-light:  #D6CEB8;
+
+    /* ── text ── */
+    --color-ink:         #4A4234;
+    --color-muted:       #7C7567;
+
+    /* ── accent ── */
+    --color-terracotta:  #B26A4F;
+
+    /* ── borders / dividers ── */
+    --color-rule:        #C8BEAA;
+    --color-badge-border:#BFA892;
+    --color-dashed:      #A79D8A;
+
+    /* ── shadow ── */
+    --shadow-card:       0 24px 48px -12px rgba(60,50,40,0.15),
+                         0 0 0 1px rgba(200,190,170,0.6);
+
+    /* ── flip ── */
+    --flip-duration:     500ms;
+    --flip-easing:       cubic-bezier(0.4, 0.15, 0.2, 1);
+  }
+}

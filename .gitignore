@@ -1,0 +1,29 @@
+# env
+.env
+.env.local
+.env.*.local
+
+# deps
+node_modules/
+.pnpm-store/
+
+# build
+.next/
+dist/
+out/
+build/
+
+# turbo
+.turbo/
+
+# drizzle
+drizzle/
+
+# misc
+.DS_Store
+*.log
+.vercel
+*.tsbuildinfo
+
+# claude code
+.claude/settings.local.json

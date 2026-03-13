@@ -1,0 +1,30 @@
+{
+  "name": "rolodex",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@9.0.0",
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "typecheck": "turbo typecheck",
+    "db:generate": "pnpm --filter @rolodex/db generate",
+    "db:migrate": "pnpm --filter @rolodex/db migrate",
+    "db:seed": "pnpm --filter @rolodex/db seed",
+    "db:studio": "pnpm --filter @rolodex/db studio"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "devDependencies": {
+    "turbo": "^1.13.4",
+    "typescript": "^5.4.0",
+    "@types/node": "^20.0.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "esbuild": "0.19.12"
+    }
+  }
+}
