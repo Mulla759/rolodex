@@ -14,9 +14,12 @@
     "migrate": "drizzle-kit migrate",
     "seed": "tsx scripts/seed.ts",
     "studio": "drizzle-kit studio",
-    "cleanup": "tsx scripts/cleanup-names.ts"
+    "cleanup": "tsx scripts/cleanup-names.ts",
+    "enrich": "tsx scripts/enrich.ts",
+    "enrich:dry": "tsx scripts/enrich.ts --dry-run"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.20.0",
     "@neondatabase/serverless": "^0.9.0",
     "dotenv": "^17.3.1",
     "drizzle-orm": "^0.30.0"

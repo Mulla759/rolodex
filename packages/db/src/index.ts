@@ -24,3 +24,4 @@ export const db = drizzle(sql, { schema });
 // re-export schema and types for convenience
 export * from "./schema";
 export * from "./types";
+export type { ProxycurlProfile } from "./enrichment/proxycurl";

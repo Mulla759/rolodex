@@ -81,15 +81,48 @@ export const studentSaves = pgTable(
 );
 
 // ─────────────────────────────────────────────
+// recruiter_teams
+// Populated by AI enrichment pipeline from LinkedIn data.
+// Each row = one team/role a recruiter hires for.
+// ─────────────────────────────────────────────
+export const recruiterTeams = pgTable(
+  "recruiter_teams",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    recruiterId: uuid("recruiter_id")
+      .notNull()
+      .references(() => recruiters.id, { onDelete: "cascade" }),
+    teamName: text("team_name").notNull(),
+    company: text("company").notNull(),
+    techTags: text("tech_tags").array().default([]),
+    levelRange: text("level_range"),
+    placements: integer("placements").default(0),
+    source: text("source").default("linkedin_jobs"),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  },
+  (t) => ({
+    recruiterIdx: index("recruiter_teams_recruiter_id_idx").on(t.recruiterId),
+  })
+);
+
+// ─────────────────────────────────────────────
 // relations (for drizzle relational queries)
 // ─────────────────────────────────────────────
 export const recruitersRelations = relations(recruiters, ({ many }) => ({
   saves: many(studentSaves),
+  teams: many(recruiterTeams),
 }));
 
 export const studentSavesRelations = relations(studentSaves, ({ one }) => ({
   recruiter: one(recruiters, {
     fields: [studentSaves.recruiterId],
+    references: [recruiters.id],
+  }),
+}));
+
+export const recruiterTeamsRelations = relations(recruiterTeams, ({ one }) => ({
+  recruiter: one(recruiters, {
+    fields: [recruiterTeams.recruiterId],
     references: [recruiters.id],
   }),
 }));
