@@ -17,7 +17,6 @@
     "cleanup": "tsx scripts/cleanup-names.ts",
     "enrich": "tsx scripts/enrich.ts",
     "enrich:dry": "tsx scripts/enrich.ts --dry-run"
-    "cleanup": "tsx scripts/cleanup-names.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.20.0",
