@@ -25,5 +25,8 @@ drizzle/
 .vercel
 *.tsbuildinfo
 
+# enrichment progress (resume file)
+.enrich-progress.json
+
 # claude code
 .claude/settings.local.json

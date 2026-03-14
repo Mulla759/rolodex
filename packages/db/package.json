@@ -16,7 +16,10 @@
     "studio": "drizzle-kit studio",
     "cleanup": "tsx scripts/cleanup-names.ts",
     "enrich": "tsx scripts/enrich.ts",
-    "enrich:dry": "tsx scripts/enrich.ts --dry-run"
+    "enrich:dry": "tsx scripts/enrich.ts --dry-run",
+    "enrich:pool": "tsx scripts/enrich-pool.ts",
+    "enrich:pool:dry": "tsx scripts/enrich-pool.ts --dry-run",
+    "enrich:company": "tsx scripts/enrich-pool.ts --company"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.20.0",
