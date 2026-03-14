@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { RecruiterData } from "./types";
+import ContributeForm from "./ContributeForm";
 
 interface CardBackProps {
   recruiter: RecruiterData;
@@ -24,6 +25,7 @@ export default function CardBack({ recruiter, flipped, shellClassName }: CardBac
   const [draft, setDraft] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showContributeForm, setShowContributeForm] = useState(false);
   const hasRequestedRef = useRef(false);
   const abortRef = useRef<AbortController | null>(null);
 
@@ -134,6 +136,26 @@ export default function CardBack({ recruiter, flipped, shellClassName }: CardBac
           Regenerate
         </button>
       </div>
+
+      {showContributeForm ? (
+        <ContributeForm
+          recruiterId={recruiter.id}
+          onClose={() => setShowContributeForm(false)}
+        />
+      ) : (
+        <div className="flex justify-center mt-4">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowContributeForm(true);
+            }}
+            className="text-[10px] font-mono text-muted hover:text-ink transition-colors"
+          >
+            Report interaction
+          </button>
+        </div>
+      )}
 
       <div className="flex justify-center items-center gap-1.5 mt-6 text-muted text-[10px] font-mono font-medium uppercase tracking-[0.15em]">
         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 256 256" className="mt-0.5 rotate-180">
