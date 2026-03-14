@@ -77,9 +77,11 @@ export default function RecruiterCard({ recruiter }: { recruiter: RecruiterData 
                   {initials(r.name, r.company)}
                 </div>
                 <div className="flex flex-col justify-center gap-1.5 pt-0.5 min-w-0">
-                  <h2 className="text-[26px] text-ink leading-none font-display tracking-tight truncate">
-                    {r.name || r.company}
-                  </h2>
+                  {r.name && (
+                    <h2 className="text-[26px] text-ink leading-none font-display tracking-tight truncate">
+                      {r.name}
+                    </h2>
+                  )}
                   <div className="flex items-center gap-2.5 mt-0.5 flex-wrap">
                     <span className="border border-ink text-ink text-[10px] px-2 py-0.5 rounded-[3px] font-mono font-medium tracking-[0.15em] uppercase">
                       {r.company}
