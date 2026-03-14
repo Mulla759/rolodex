@@ -198,6 +198,19 @@ NEXT_PUBLIC_APP_URL=      # http://localhost:3000
 
 ---
 
+## Enrichment pipeline
+
+Pooled enrichment runner: `packages/db/scripts/enrich-pool.ts`
+- Respects Proxycurl rate limits via `--concurrency` and `--delay`
+- Searches by email when `linkedin_url` is null (finds names for email-only records)
+- Writes name back to DB if currently null
+- Resume-capable via `.enrich-progress.json`
+- Run: `pnpm --filter @rolodex/db enrich:pool`
+- Dry run: `pnpm --filter @rolodex/db enrich:pool:dry`
+- By company: `pnpm --filter @rolodex/db enrich:company -- --company "Apple"`
+
+---
+
 ## What's NOT built yet (do not hallucinate these)
 
 - Auth / `.edu` gate
