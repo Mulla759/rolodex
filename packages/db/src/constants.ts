@@ -40,6 +40,25 @@ export const ACCOLADE_LABELS: Record<Accolade, string> = {
   phd_accepted: "PhD OK",
 };
 
+// ─── Contribution domain types ──────────────────
+
+export type ContributionType = "interaction" | "profile_edit" | "linkedin_url";
+export type ContributionStatus = "pending" | "approved" | "rejected";
+
+// ─── Contribution constants ─────────────────────
+
+export const CONTRIBUTION_TYPES: ContributionType[] = [
+  "interaction",
+  "profile_edit",
+  "linkedin_url",
+];
+
+export const CONTRIBUTION_STATUS: ContributionStatus[] = [
+  "pending",
+  "approved",
+  "rejected",
+];
+
 // ─── API response shapes ───────────────────────
 
 export interface RecruiterSearchParams {

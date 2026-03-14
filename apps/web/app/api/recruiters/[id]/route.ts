@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db, recruiters, recruiterTeams } from "@rolodex/db";
+import { db, recruiters, recruiterTeams, recruiterMetrics } from "@rolodex/db";
 import { eq } from "drizzle-orm";
 
 export async function GET(
@@ -24,10 +24,10 @@ export async function GET(
     return NextResponse.json({ error: "Recruiter not found" }, { status: 404 });
   }
 
-  const teams = await db
-    .select()
-    .from(recruiterTeams)
-    .where(eq(recruiterTeams.recruiterId, id));
+  const [teams, [metrics]] = await Promise.all([
+    db.select().from(recruiterTeams).where(eq(recruiterTeams.recruiterId, id)),
+    db.select().from(recruiterMetrics).where(eq(recruiterMetrics.recruiterId, id)).limit(1),
+  ]);
 
-  return NextResponse.json({ data: { ...recruiter, teams } });
+  return NextResponse.json({ data: { ...recruiter, teams, metrics: metrics ?? null } });
 }

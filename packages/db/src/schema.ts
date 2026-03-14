@@ -108,9 +108,11 @@ export const recruiterTeams = pgTable(
 // ─────────────────────────────────────────────
 // relations (for drizzle relational queries)
 // ─────────────────────────────────────────────
-export const recruitersRelations = relations(recruiters, ({ many }) => ({
+export const recruitersRelations = relations(recruiters, ({ one, many }) => ({
   saves: many(studentSaves),
   teams: many(recruiterTeams),
+  metrics: one(recruiterMetrics),
+  contributions: many(contributions),
 }));
 
 export const studentSavesRelations = relations(studentSaves, ({ one }) => ({
@@ -123,6 +125,70 @@ export const studentSavesRelations = relations(studentSaves, ({ one }) => ({
 export const recruiterTeamsRelations = relations(recruiterTeams, ({ one }) => ({
   recruiter: one(recruiters, {
     fields: [recruiterTeams.recruiterId],
+    references: [recruiters.id],
+  }),
+}));
+
+// ─────────────────────────────────────────────
+// recruiter_metrics
+// One row per recruiter. Computed from approved contributions.
+// Recalculated every time an 'interaction' contribution is approved.
+// ─────────────────────────────────────────────
+export const recruiterMetrics = pgTable("recruiter_metrics", {
+  recruiterId: uuid("recruiter_id")
+    .primaryKey()
+    .references(() => recruiters.id, { onDelete: "cascade" }),
+  responseRate: numeric("response_rate", { precision: 5, scale: 2 }),
+  avgReplyDays: numeric("avg_reply_days", { precision: 5, scale: 1 }),
+  studentsPlaced: integer("students_placed").default(0),
+  interactionCount: integer("interaction_count").default(0),
+  lastUpdated: timestamp("last_updated", { withTimezone: true }).defaultNow(),
+});
+
+// ─────────────────────────────────────────────
+// contributions
+// Student-submitted data. Starts as pending, admin approves or rejects.
+// Types: 'interaction' | 'profile_edit' | 'linkedin_url'
+// ─────────────────────────────────────────────
+export const contributions = pgTable(
+  "contributions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    recruiterId: uuid("recruiter_id")
+      .notNull()
+      .references(() => recruiters.id, { onDelete: "cascade" }),
+    studentId: text("student_id").notNull(),
+    type: text("type").notNull(),
+    payload: text("payload").notNull(),
+    status: text("status").default("pending"),
+    notes: text("notes"),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+    reviewedBy: text("reviewed_by"),
+  },
+  (t) => ({
+    recruiterIdIdx: index("contributions_recruiter_id_idx").on(t.recruiterId),
+    statusIdx: index("contributions_status_idx").on(t.status),
+    studentIdIdx: index("contributions_student_id_idx").on(t.studentId),
+  })
+);
+
+// ─────────────────────────────────────────────
+// relations — recruiter_metrics
+// ─────────────────────────────────────────────
+export const recruiterMetricsRelations = relations(recruiterMetrics, ({ one }) => ({
+  recruiter: one(recruiters, {
+    fields: [recruiterMetrics.recruiterId],
+    references: [recruiters.id],
+  }),
+}));
+
+// ─────────────────────────────────────────────
+// relations — contributions
+// ─────────────────────────────────────────────
+export const contributionsRelations = relations(contributions, ({ one }) => ({
+  recruiter: one(recruiters, {
+    fields: [contributions.recruiterId],
     references: [recruiters.id],
   }),
 }));

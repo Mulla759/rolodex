@@ -1,15 +1,27 @@
 import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
-import type { recruiters, studentSaves, recruiterTeams } from "./schema";
+import type { recruiters, studentSaves, recruiterTeams, recruiterMetrics, contributions } from "./schema";
 
 // ─── Select types (what comes OUT of the DB) ──
 export type Recruiter = InferSelectModel<typeof recruiters>;
 export type StudentSave = InferSelectModel<typeof studentSaves>;
 export type RecruiterTeam = InferSelectModel<typeof recruiterTeams>;
+export type RecruiterMetrics = InferSelectModel<typeof recruiterMetrics>;
+export type Contribution = InferSelectModel<typeof contributions>;
 
 // ─── Insert types (what goes IN to the DB) ────
 export type NewRecruiter = InferInsertModel<typeof recruiters>;
 export type NewStudentSave = InferInsertModel<typeof studentSaves>;
 export type NewRecruiterTeam = InferInsertModel<typeof recruiterTeams>;
+export type NewRecruiterMetrics = InferInsertModel<typeof recruiterMetrics>;
+export type NewContribution = InferInsertModel<typeof contributions>;
+
+// Re-export contribution domain types from constants
+export {
+  type ContributionType,
+  type ContributionStatus,
+  CONTRIBUTION_TYPES,
+  CONTRIBUTION_STATUS,
+} from "./constants";
 
 // ─── Response shape (uses Recruiter from drizzle) ──
 export interface RecruiterListResponse {
