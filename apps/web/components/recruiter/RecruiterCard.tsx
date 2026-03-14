@@ -3,28 +3,11 @@
 import { useState } from "react";
 import type { Accolade } from "@rolodex/db/constants";
 import { ACCOLADE_LABELS } from "@rolodex/db/constants";
+import CardBack from "./CardBack";
+import { useSaveList } from "@/lib/hooks/useSaveList";
+import type { RecruiterData } from "./types";
 
-/** Mirrors the Recruiter select type — kept here so the client bundle
- *  never imports drizzle-orm or Node.js modules. */
-export interface RecruiterData {
-  id: string;
-  company: string;
-  name: string | null;
-  email: string;
-  title: string | null;
-  linkedinUrl: string | null;
-  githubUrl: string | null;
-  location: string | null;
-  status: string | null;
-  verifiedAt: Date | string | null;
-  sourceDate: string | null;
-  responseRate: string | null;
-  avgReplyDays: number | null;
-  studentsPlaced: number | null;
-  accolades: string[] | null;
-  roleTags: string[] | null;
-  industryTags: string[] | null;
-}
+export type { RecruiterData } from "./types";
 
 function initials(name: string | null, company: string): string {
   if (name) {
@@ -52,7 +35,10 @@ const cardShell =
 
 export default function RecruiterCard({ recruiter }: { recruiter: RecruiterData }) {
   const [flipped, setFlipped] = useState(false);
+  const { toggle, isSaved } = useSaveList();
   const r = recruiter;
+  const saved = isSaved(r.id);
+  const shellClassName = saved ? `${cardShell} border-2 border-terracotta` : cardShell;
 
   const hasMetrics =
     r.responseRate != null || r.avgReplyDays != null || r.studentsPlaced != null;
@@ -63,7 +49,7 @@ export default function RecruiterCard({ recruiter }: { recruiter: RecruiterData 
   return (
     <div
       className="w-full cursor-pointer"
-      style={{ perspective: "900px" }}
+      style={{ perspective: "var(--perspective-card)" }}
       onClick={() => setFlipped((f) => !f)}
     >
       {/* inner wrapper — both faces are absolute inside, sized by a hidden sizer */}
@@ -80,7 +66,7 @@ export default function RecruiterCard({ recruiter }: { recruiter: RecruiterData 
       >
         {/* ═══ FRONT FACE ═══ */}
         <div style={{ backfaceVisibility: "hidden" }}>
-          <div className={cardShell}>
+          <div className={shellClassName}>
             {/* spindle tab */}
             <span className="absolute -top-1 left-1/2 -translate-x-1/2 w-24 h-2 bg-ink rounded-full" />
 
@@ -111,6 +97,25 @@ export default function RecruiterCard({ recruiter }: { recruiter: RecruiterData 
               </div>
 
               <div className="flex flex-col items-end gap-1.5 pt-1 shrink-0 ml-4">
+                <button
+                  type="button"
+                  aria-label={saved ? "Unsave recruiter" : "Save recruiter"}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggle(r.id);
+                  }}
+                  className="text-ink hover:text-terracotta transition-colors"
+                >
+                  {saved ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 256 256">
+                      <path d="M184,32H72A16,16,0,0,0,56,48V224a8,8,0,0,0,12.24,6.74L128,193.3l59.76,37.44A8,8,0,0,0,200,224V48A16,16,0,0,0,184,32Z" />
+                    </svg>
+                  ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 256 256">
+                      <path d="M184,32H72A16,16,0,0,0,56,48V224a8,8,0,0,0,12.24,6.74L128,193.3l59.76,37.44A8,8,0,0,0,200,224V48A16,16,0,0,0,184,32Z" stroke="currentColor" strokeWidth="16" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  )}
+                </button>
                 {r.status === "active" && (
                   <span className="text-terracotta text-[10px] font-mono font-medium tracking-[0.15em] uppercase">
                     Active
@@ -248,53 +253,7 @@ export default function RecruiterCard({ recruiter }: { recruiter: RecruiterData 
           className="absolute inset-0"
           style={{ backfaceVisibility: "hidden", transform: "rotateX(180deg)" }}
         >
-          <div className={cardShell + " h-full"}>
-            {/* spindle tab — appears at bottom when card is flipped */}
-            <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-24 h-2 bg-ink rounded-full" />
-
-            {/* header */}
-            <div className="mb-6">
-              <h2 className="text-xl text-ink font-display tracking-tight">
-                {r.name || r.company}
-              </h2>
-              <p className="text-sm text-muted font-sans mt-1">{r.company}</p>
-            </div>
-
-            <hr className="h-[2px] border-0 bg-gradient-to-r from-terracotta from-[25%] to-ink to-[25%] mb-6" />
-
-            {/* AI draft placeholder */}
-            <div className="flex-1 rounded-lg border border-dashed border-dashed bg-card-light/50 p-5 flex flex-col items-center justify-center text-center min-h-[120px]">
-              <p className="text-sm text-muted font-sans">AI outreach draft</p>
-              <p className="text-xs text-muted/60 font-mono mt-2">Coming soon — Phase 2</p>
-            </div>
-
-            {/* action buttons */}
-            <div className="flex gap-3 mt-6">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigator.clipboard.writeText(r.email);
-                }}
-                className="flex-1 border border-ink text-ink text-[11px] font-mono font-medium tracking-[0.1em] uppercase py-2.5 rounded-md hover:bg-ink hover:text-card transition-colors"
-              >
-                Copy Email
-              </button>
-              <button
-                onClick={(e) => e.stopPropagation()}
-                className="flex-1 bg-terracotta text-card text-[11px] font-mono font-medium tracking-[0.1em] uppercase py-2.5 rounded-md hover:opacity-90 transition-opacity"
-              >
-                Regenerate
-              </button>
-            </div>
-
-            {/* hint */}
-            <div className="flex justify-center items-center gap-1.5 mt-6 text-muted text-[10px] font-mono font-medium uppercase tracking-[0.15em]">
-              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 256 256" className="mt-0.5 rotate-180">
-                <path d="M205.66,149.66l-72,72a8,8,0,0,1-11.32,0l-72-72a8,8,0,0,1,11.32-11.32L120,196.69V40a8,8,0,0,1,16,0V196.69l58.34-58.35a8,8,0,0,1,11.32,11.32Z" />
-              </svg>
-              <span>tap to go back</span>
-            </div>
-          </div>
+          <CardBack recruiter={r} flipped={flipped} shellClassName={shellClassName} />
         </div>
       </div>
     </div>
