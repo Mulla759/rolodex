@@ -45,6 +45,22 @@ function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 }
 
+function cleanParsedName(name: string | null, company: string): string | null {
+  if (!name || !name.trim()) return null;
+
+  const n = name.trim();
+  const nLower = n.toLowerCase();
+  const cLower = company.toLowerCase();
+
+  // Value matches or is substring of company name (case-insensitive)
+  if (cLower.includes(nLower) || nLower.includes(cLower)) return null;
+
+  // Single word that looks like a company abbreviation (no spaces, not a typical name)
+  if (!/\s/.test(n) && n.length <= 5 && n === n.toUpperCase()) return null;
+
+  return n;
+}
+
 async function seed() {
   let raw = readFileSync(CSV_PATH, "utf-8");
   // CSV has an empty first row — strip it so PapaParse picks up the real headers
@@ -84,9 +100,13 @@ async function seed() {
 
     seen.add(email);
 
+    const normalizedCompany = normalizeCompany(company);
+    const rawName = row.Name?.trim() || null;
+    const cleanName = cleanParsedName(rawName, normalizedCompany);
+
     rows.push({
-      company: normalizeCompany(company),
-      name: row.Name?.trim() || null,
+      company: normalizedCompany,
+      name: cleanName,
       email,
       sourceDate: parseSourceDate(row["Date Appeared"]),
       status: "active",

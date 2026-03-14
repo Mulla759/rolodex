@@ -17,6 +17,7 @@
     },
     "generate": { "cache": false },
     "migrate": { "cache": false },
-    "seed": { "cache": false }
+    "seed": { "cache": false },
+    "test": { "dependsOn": [], "cache": false }
   }
 }
