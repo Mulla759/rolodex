@@ -31,5 +31,6 @@
     /* ── flip ── */
     --flip-duration:     500ms;
     --flip-easing:       cubic-bezier(0.4, 0.15, 0.2, 1);
+    --perspective-card:  900px;
   }
 }
