@@ -1,0 +1,108 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+      - 'feature/**'
+      - 'fix/**'
+      - 'user/**'
+      - 'hotfix/**'
+      - 'agent/**'
+      - 'claude/**'
+      - 'cursor/**'
+  pull_request:
+    branches:
+      - develop
+      - main
+
+jobs:
+  # ── Type check ────────────────────────────────────────────
+  typecheck:
+    name: ci/typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+  # ── Lint ──────────────────────────────────────────────────
+  lint:
+    name: ci/lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+  # ── Token enforcement ─────────────────────────────────────
+  token-check:
+    name: ci/token-check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for hardcoded hex colors in components
+        run: |
+          if grep -rn '#[0-9a-fA-F]\{3,6\}\b' apps/web/components/ --include="*.tsx" --include="*.ts" --include="*.css"; then
+            echo "TOKEN VIOLATION: hardcoded hex color found. Use CSS token variables instead."
+            exit 1
+          fi
+          echo "Token check passed."
+
+      - name: Check for hardcoded px values in components
+        run: |
+          if grep -rn 'style=.*[0-9]\+px' apps/web/components/ --include="*.tsx"; then
+            echo "TOKEN VIOLATION: inline hardcoded px value found in component style prop. Use token classes."
+            exit 1
+          fi
+          echo "Px check passed."
+
+  # ── Schema guard ──────────────────────────────────────────
+  schema-guard:
+    name: ci/schema-guard
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check if schema changed without migration
+        run: |
+          SCHEMA_CHANGED=$(git diff origin/${{ github.base_ref }}...HEAD -- packages/db/src/schema.ts | wc -l)
+          MIGRATION_CHANGED=$(git diff origin/${{ github.base_ref }}...HEAD -- packages/db/migrations/ | wc -l)
+
+          if [ "$SCHEMA_CHANGED" -gt 0 ] && [ "$MIGRATION_CHANGED" -eq 0 ]; then
+            echo "SCHEMA GUARD: schema.ts changed but no migration file added."
+            echo "Run pnpm db:generate to create a migration, then commit it."
+            exit 1
+          fi
+          echo "Schema guard passed."

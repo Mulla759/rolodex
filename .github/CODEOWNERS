@@ -1,0 +1,26 @@
+# CODEOWNERS — Rolodex
+# These owners are required reviewers when the listed paths change on main.
+# Format: path  @github-username
+
+# Schema and migrations — human review required, agents blocked via ruleset
+packages/db/src/schema.ts           @Mulla759
+packages/db/migrations/             @Mulla759
+
+# Project context — agents must not modify this directly
+.claude/CONTEXT.md                  @Mulla759
+CONTEXT.md                          @Mulla759
+
+# Monorepo config
+turbo.json                          @Mulla759
+pnpm-workspace.yaml                 @Mulla759
+package.json                        @Mulla759
+
+# Design tokens — changes here affect the entire UI
+apps/web/app/globals.css            @Mulla759
+apps/web/tailwind.config.ts         @Mulla759
+
+# CI
+.github/                            @Mulla759
+
+# Env template (never commit .env.local)
+.env.example                        @Mulla759
