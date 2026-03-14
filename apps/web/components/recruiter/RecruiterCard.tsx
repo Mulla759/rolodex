@@ -9,16 +9,22 @@ import type { RecruiterData } from "./types";
 
 export type { RecruiterData } from "./types";
 
-function initials(name: string | null, company: string): string {
-  if (name) {
-    return name
-      .split(/\s+/)
-      .slice(0, 2)
-      .map((w) => w[0])
-      .join("")
-      .toUpperCase();
-  }
-  return company.slice(0, 2).toUpperCase();
+function formatEmailUsername(email: string): string {
+  const username = email.split("@")[0];
+  return username
+    .split(/[._]/)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(" ");
+}
+
+function initials(name: string | null, email: string): string {
+  const display = name || formatEmailUsername(email);
+  return display
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((w) => w[0])
+    .join("")
+    .toUpperCase();
 }
 
 function formatVerified(date: Date | string | null): string | null {
@@ -74,13 +80,22 @@ export default function RecruiterCard({ recruiter }: { recruiter: RecruiterData 
             <div className="flex justify-between items-start w-full">
               <div className="flex gap-5 min-w-0">
                 <div className="w-[72px] h-[72px] rounded-md border-2 border-ink bg-card-light flex items-center justify-center text-ink text-2xl font-display shrink-0">
-                  {initials(r.name, r.company)}
+                  {initials(r.name, r.email)}
                 </div>
                 <div className="flex flex-col justify-center gap-1.5 pt-0.5 min-w-0">
-                  {r.name && (
+                  {r.name ? (
                     <h2 className="text-[26px] text-ink leading-none font-display tracking-tight truncate">
                       {r.name}
                     </h2>
+                  ) : (
+                    <div className="flex items-baseline gap-2 min-w-0">
+                      <h2 className="text-[26px] leading-none font-display tracking-tight truncate italic" style={{ color: "var(--ink-400)" }}>
+                        {formatEmailUsername(r.email)}
+                      </h2>
+                      <span className="text-[9px] font-mono font-medium shrink-0" style={{ color: "var(--ink-400)" }}>
+                        Name unverified
+                      </span>
+                    </div>
                   )}
                   <div className="flex items-center gap-2.5 mt-0.5 flex-wrap">
                     <span className="border border-ink text-ink text-[10px] px-2 py-0.5 rounded-[3px] font-mono font-medium tracking-[0.15em] uppercase">
